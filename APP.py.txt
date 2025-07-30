@@ -1,0 +1,35 @@
+import streamlit as st
+import openai
+
+# API key will be stored securely in Streamlit secrets
+openai.api_key = st.secrets["OPENAI_API_KEY"]
+
+def generate_meme(message):
+    prompt = f"""
+    You are MemeGPT. 
+    1. Detect the vibe of this message (examples: angry, passive aggressive, sad, romantic, cringe, funny, red flag 🚩).
+    2. Suggest a meme template (e.g., Drake meme, Distracted Boyfriend, SpongeBob, The Office, etc.).
+    3. Generate a meme caption in top-text and bottom-text format.
+
+    Message: "{message}"
+    """
+
+    response = openai.ChatCompletion.create(
+        model="gpt-4o-mini",
+        messages=[{"role": "user", "content": prompt}]
+    )
+
+    return response["choices"][0]["message"]["content"]
+
+st.set_page_config(page_title="VibeMeme", page_icon="😂")
+st.title("😂 VibeMeme - Turn Any Message Into a Meme")
+
+message = st.text_area("Paste a message here:")
+
+if st.button("Generate Meme Idea"):
+    if message.strip() != "":
+        result = generate_meme(message)
+        st.subheader("🎭 Meme Output")
+        st.write(result)
+    else:
+        st.warning("Please enter a message first.")
